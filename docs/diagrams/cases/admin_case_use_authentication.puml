@@ -1,0 +1,15 @@
+@startuml
+
+left to right direction
+actor Admin #lightblue
+actor "Higher Authority" as HigherAuthority #lightblue
+
+rectangle "User's Purchase History" as PurchaseHistory {
+  Admin --> (Check Purchase History) : "Requests to check"
+  (Check Purchase History) --> (Review Purchase History) : "Authorized"
+  (Review Purchase History) --> Admin : "Displays history"
+}
+
+Admin --> HigherAuthority : "Reports on history"
+
+@enduml

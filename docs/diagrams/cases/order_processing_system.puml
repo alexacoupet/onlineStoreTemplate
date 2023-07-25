@@ -1,0 +1,22 @@
+@startuml order_processing_system
+left to right direction
+actor Customer
+rectangle "Order Processing System" as system {
+  (Order Creation)
+  (Order Management)
+  (Inventory Management)
+  (Payment Processing)
+  (Order Tracking)
+  (Order Fulfillment)
+  (Order Cancellation/Modification)
+  (Return and Refund Handling)
+}
+Customer --> (Order Creation)
+Customer --> (Order Management)
+Customer --> (Inventory Management)
+Customer --> (Payment Processing)
+Customer --> (Order Tracking)
+Customer --> (Order Fulfillment)
+Customer --> (Order Cancellation/Modification)
+Customer --> (Return and Refund Handling)
+@enduml

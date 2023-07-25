@@ -1,0 +1,20 @@
+@startuml search_engine
+left to right direction
+actor Customer
+rectangle "System" as system {
+  (Keyword Search)
+  (Filtering Options)
+  (Sorting)
+  (Auto-suggestions)
+  (Spell Correction)
+  (Faceted Search)
+  (Search Analytics)
+}
+Customer --> (Keyword Search)
+Customer --> (Filtering Options)
+Customer --> (Sorting)
+Customer --> (Auto-suggestions)
+Customer --> (Spell Correction)
+Customer --> (Faceted Search)
+Customer --> (Search Analytics)
+@enduml

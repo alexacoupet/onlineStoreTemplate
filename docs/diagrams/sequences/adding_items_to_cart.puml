@@ -1,0 +1,12 @@
+@startuml
+
+actor "Regular User" as RegularUser #lightblue
+boundary "System" as System #lightgrey
+
+RegularUser -> System : "Browse Product Catalog"
+RegularUser -> System : "Select Items to Add to Cart"
+System --> RegularUser : "Items Added to Cart"
+RegularUser -> System : "Continue Shopping / Remove Items"
+System --> RegularUser : "Cart Updated"
+
+@enduml

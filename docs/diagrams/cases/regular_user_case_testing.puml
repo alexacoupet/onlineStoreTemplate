@@ -1,0 +1,16 @@
+@startuml
+
+actor "Regular User" as RegularUser #lightblue
+
+left to right direction
+
+rectangle "Product Search" {
+  RegularUser --> (Search Products) : "Enter Keywords in Search Bar"
+  (Search Products) --> (Apply Filters) : "Use Filters (if any)"
+  (Search Products) --> (Display Results) : "Display All Search Results"
+  (Apply Filters) --> (Display Filtered Results) : "Display Filtered Results"
+  (Display Results) --> (Browse Products) : "Browse and Find Products"
+  (Display Filtered Results) --> (Browse Products) : "Browse and Find Products"
+}
+
+@enduml

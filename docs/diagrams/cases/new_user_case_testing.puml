@@ -1,0 +1,14 @@
+@startuml
+
+actor "New User" as NewUser #lightblue
+
+left to right direction
+
+rectangle "Registration" {
+  NewUser --> (Create Account) : "Provide Email and Password"
+  (Create Account) --> (Verify Email) : "Verify"
+  (Verify Email) --> (Receive Verification Email) : "Send Verification Email"
+  (Receive Verification Email) --> (Confirmation) : "Confirm Account"
+}
+
+@enduml

@@ -1,0 +1,11 @@
+@startuml
+
+actor "Registered User" as RegisteredUser #lightblue
+boundary "System" as System #lightgrey
+
+RegisteredUser -> System : "Enter Username and Password"
+System --> System : "Authenticate User"
+System --> RegisteredUser : "Access Granted"
+
+@enduml
+

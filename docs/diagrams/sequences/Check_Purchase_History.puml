@@ -1,0 +1,17 @@
+@startuml
+title Sequence Diagram: Check Purchase History
+
+actor Admin #lightblue
+actor "Higher Authority" as HigherAuthority #lightblue
+
+Admin -> "User's Purchase History": Requests to check
+activate "User's Purchase History"
+"User's Purchase History" -> "Review Purchase History": Authorized
+activate "Review Purchase History"
+"Review Purchase History" --> Admin: Displays history
+deactivate "Review Purchase History"
+deactivate "User's Purchase History"
+
+Admin --> HigherAuthority: Reports on history
+
+@enduml

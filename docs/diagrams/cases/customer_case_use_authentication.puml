@@ -1,0 +1,13 @@
+@startuml
+
+actor Customer #lightblue
+
+rectangle "Change Password" as ChangePassword {
+  Customer --> (Forgot Passcode) : "Forgets passcode"
+  (Forgot Passcode) --> (Change Passcode) : "Wants to change"
+  (Change Passcode) --> (Check Availability) : "Chooses familiar passcode"
+  (Check Availability) --> (Password Already in Use) : "Password is already in use"
+  (Password Already in Use) --> Customer : "Password is already your current password"
+}
+
+@enduml

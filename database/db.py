@@ -22,6 +22,40 @@ class Database:
             database_path, check_same_thread=False)
         self.connection.row_factory = dict_factory
         self.cursor = self.connection.cursor()
+        
+    #-----------------------------------------------
+    #-----------------------------------------------
+    #Added function within database from Jack Eliseo
+    #-----------------------------------------------
+    #-----------------------------------------------
+        
+
+
+    def execute_query(self, query):
+        connection = sqlite3.connect(self.database_path)
+        cursor = connection.cursor()
+        cursor.execute(query)
+        connection.commit()
+        return cursor  # Return the cursor instead of fetching all results
+
+
+
+
+
+    def is_valid_email_in_database(self, email: str) -> bool:
+        query = f"SELECT COUNT(*) FROM users WHERE email='{email}'"
+        cursor = self.execute_query(query)
+        count = cursor.fetchone()  # Use fetchone() on the cursor
+        return count[0] == 1 if count is not None else False
+
+
+
+
+
+
+
+
+
 
     # --------------------------------------------
     # ----------------- INVENTORY ----------------

@@ -2,8 +2,13 @@
 
 from authentication.auth_tools import login_pipeline, update_passwords, hash_password
 from database.db import Database
-from flask import Flask, render_template, request, url_for, redirect, sessions
+from flask import Flask, render_template, request, url_for, redirect, session
 from core.session import Sessions
+import random
+import string
+import os
+
+
 
 app = Flask(__name__)
 HOST, PORT = 'localhost', 8080
@@ -137,11 +142,18 @@ def checkout():
     return render_template('checkout.html', order=order, sessions=sessions, total_cost=user_session.total_cost)
 
 
-    #-----------------------------------------------
-    #-----------------------------------------------
-    #Added function within database from Jack Eliseo
-    #-----------------------------------------------
-    #-----------------------------------------------
+#---------------------------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------------------
+#                          ||   Added functions and changes from Jack Eliseo   ||
+#---------------------------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------------------
+
+
+app.secret_key = os.environ.get('SECRET_KEY', 'f89049a8cc4bda8828ad76eb822ae791')
+
+
 
 #Route to newpassword.html
 @app.route('/newpassword', methods=['GET'])
@@ -159,6 +171,14 @@ def good_email():
 def bad_email():
     return render_template('bad_email.html')
 
+
+#Creation of random 6 digit code user will need to copy for password reset 
+def generate_random_string(length):
+    characters = string.ascii_letters + string.digits + string.punctuation
+    random_string = ''.join(random.choice(characters) for _ in range(length))
+    return random_string
+
+
 @app.route('/password_reset', methods=['POST'])
 def password_reset():
     """
@@ -175,12 +195,17 @@ def password_reset():
 
     # Check if the email exists in the database
     if db.is_valid_email_in_database(email):
-        # Email is valid, redirect to good_email.html
+        # Email is valid, generate the random 6-digit code
+        code = generate_random_string(6)
+
+        # Store the code in the session
+        session['reset_code'] = code
+
+        # Redirect to good_email.html
         return redirect(url_for('good_email'))
     else:
         # Email is not valid, redirect to bad_email.html
         return redirect(url_for('bad_email'))
-
 
 
 

@@ -1,10 +1,13 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Valid Email</title>
-</head>
-<body>
-    <h1>Good Email!</h1>
-    <p>Your email is valid and exists in our system.</p>
-</body>
-</html>
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="row" id="info_row">
+    <h3>Password Reset Confirmed</h3>
+    <p>Your password reset code is:</p>
+    <div class="col-md-12" id="login_class">
+        <div class="form-group" id="info_form_group">
+            <p>{{ session['reset_code'] }}</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

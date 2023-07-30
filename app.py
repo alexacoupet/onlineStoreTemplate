@@ -2,7 +2,7 @@
 
 from authentication.auth_tools import login_pipeline, update_passwords, hash_password
 from database.db import Database
-from flask import Flask, render_template, request, url_for, redirect
+from flask import Flask, render_template, request, url_for, redirect, sessions
 from core.session import Sessions
 
 app = Flask(__name__)
@@ -139,7 +139,7 @@ def checkout():
 
     #-----------------------------------------------
     #-----------------------------------------------
-    #Added routes within database from Jack Eliseo
+    #Added function within database from Jack Eliseo
     #-----------------------------------------------
     #-----------------------------------------------
 
@@ -173,9 +173,6 @@ def password_reset():
     """
     email = request.form['email']
 
-    # Create a new Database object for each request
-    db = Database('database/store_records.db')
-
     # Check if the email exists in the database
     if db.is_valid_email_in_database(email):
         # Email is valid, redirect to good_email.html
@@ -183,7 +180,6 @@ def password_reset():
     else:
         # Email is not valid, redirect to bad_email.html
         return redirect(url_for('bad_email'))
-
 
 
 

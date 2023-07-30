@@ -6,8 +6,12 @@
     <p>Your password reset code is:</p>
     <div class="col-md-12" id="login_class">
         <div class="form-group" id="info_form_group">
-            <p>{{ session['reset_code'] }}</p>
+            <p><strong>{{ session['reset_code'] }}</strong></p>
         </div>
+    </div>
+    <!-- "Back to Password Reset" link and button -->
+    <div>
+        <button onclick="window.location.href='{{ url_for('newpassword') }}'">Back to Password Reset</button>
     </div>
 </div>
 {% endblock %}

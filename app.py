@@ -209,5 +209,38 @@ def password_reset():
 
 
 
+@app.route('/password_confirmation', methods=['GET', 'POST'])
+def password_confirmation():
+    """
+    Renders the password confirmation page when the user is at the `/password_confirmation` endpoint.
+
+    Returns:
+        - If the user enters the correct code, redirects to the `confirm_password_reset` route.
+        - If the user enters an incorrect code or the page is accessed via GET, renders the `password_confirmation.html` template.
+    """
+    if request.method == 'POST':
+        entered_code = request.form['code']
+        if 'reset_code' in session and session['reset_code'] == entered_code:
+            # Redirect to confirm_password_reset.html
+            return redirect(url_for('confirm_password_reset'))
+        else:
+            # Incorrect code entered, show password_confirmation.html again
+            return render_template('password_confirmation.html', error=True)
+    else:
+        # Render the password_confirmation.html template for GET requests
+        return render_template('password_confirmation.html')
+
+
+@app.route('/confirm_password_reset')
+def confirm_password_reset():
+    """
+    Renders the confirm password reset page when the user is at the `/confirm_password_reset` endpoint.
+
+    Returns:
+        - None
+    """
+    return render_template('confirm_password_reset.html')
+
+
 if __name__ == '__main__':
     app.run(debug=True, host=HOST, port=PORT)

@@ -1,7 +1,7 @@
 from core.utils import dict_factory, calculate_cost
 import datetime as dt
 import sqlite3
-
+import hashlib
 
 class Database:
     """
@@ -49,6 +49,44 @@ class Database:
         return count[0] == 1 if count is not None else False
 
 
+
+    
+    def update_password(self, email: str, new_password: str) -> bool:
+        """
+        Updates the password for a user in the database.
+
+        args:
+            - email: The email of the user whose password to update.
+            - new_password: The new password for the user.
+
+        returns:
+            - True if the password update is successful, False otherwise.
+        """
+        # Calculate the hash of the new password
+        password_hash = hashlib.sha256(new_password.encode()).hexdigest()
+
+        # Update the password hash in the database
+        query = "UPDATE users SET password_hash = ? WHERE email = ?"
+        self.execute_query(query, (password_hash, email))
+
+        # Check if the update was successful by verifying the updated password hash
+        updated_user = self.get_user_by_email(email)
+        return updated_user is not None and updated_user["password_hash"] == password_hash
+
+
+    def get_user_by_email(self, email: str):
+        """
+        Gets a user's information by their email from the database.
+
+        args:
+            - email: The email of the user to get.
+
+        returns:
+            - The user's information as a dictionary, or None if the user is not found.
+        """
+        query = "SELECT * FROM users WHERE email = ?"
+        cursor = self.execute_query(query, (email,))
+        return cursor.fetchone()
 
 
 

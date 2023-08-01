@@ -7,7 +7,7 @@ from core.session import Sessions
 import random
 import string
 import os
-
+import hashlib
 
 
 app = Flask(__name__)
@@ -274,7 +274,6 @@ def confirm_password_reset():
     else:
         # Render the confirm_password_reset.html template for GET requests
         return render_template('confirm_password_reset.html', email=session.get('reset_email'))
-
 
 
 

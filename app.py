@@ -169,6 +169,7 @@ def good_email():
 #Route to bad_email.html
 @app.route('/bad_email')
 def bad_email():
+    email = session.get('reset_email')
     return render_template('bad_email.html')
 
 
@@ -178,7 +179,8 @@ def generate_random_string(length):
     random_string = ''.join(random.choice(characters) for _ in range(length))
     return random_string
 
-
+#Handles which html page the user will be redirected towards either good_email or bad_email
+#Also stores the six digit random code and email within the session
 @app.route('/password_reset', methods=['POST'])
 def password_reset():
     """
@@ -198,14 +200,16 @@ def password_reset():
         # Email is valid, generate the random 6-digit code
         code = generate_random_string(6)
 
-        # Store the code in the session
+        # Store the code and email in the session
         session['reset_code'] = code
+        session['reset_email'] = email
 
         # Redirect to good_email.html
         return redirect(url_for('good_email'))
     else:
         # Email is not valid, redirect to bad_email.html
         return redirect(url_for('bad_email'))
+
 
 
 
@@ -225,21 +229,57 @@ def password_confirmation():
             return redirect(url_for('confirm_password_reset'))
         else:
             # Incorrect code entered, show password_confirmation.html again
-            return render_template('password_confirmation.html', error=True)
+            return render_template('password_confirmation.html', error=True, email=session.get('reset_email'))
     else:
         # Render the password_confirmation.html template for GET requests
-        return render_template('password_confirmation.html')
+        return render_template('password_confirmation.html', email=session.get('reset_email'))
 
 
-@app.route('/confirm_password_reset')
-def confirm_password_reset():
+@app.route('/password_change_success')
+def password_change_success():
     """
-    Renders the confirm password reset page when the user is at the `/confirm_password_reset` endpoint.
+    Renders the password change success page when the user successfully changes their password.
 
     Returns:
         - None
     """
-    return render_template('confirm_password_reset.html')
+    return render_template('password_change_success.html')
+
+@app.route('/confirm_password_reset', methods=['GET', 'POST'])
+def confirm_password_reset():
+    if request.method == 'POST':
+        entered_code = request.form.get('passcode')  # Use 'passcode' key to get the user-entered passcode
+
+        # Check if the entered code matches the stored code
+        if 'reset_code' in session and session['reset_code'] == entered_code:
+            new_password = request.form['new_password']
+            confirm_password = request.form['confirm_password']
+
+            # Check if passwords match and meet the limit (at least 12 characters)
+            if new_password == confirm_password and len(new_password) >= 12:
+                # Render the confirm_password_reset.html template with a success message
+                success_message = "Passwords match and meet the 12-character requirement."
+                return render_template('confirm_password_reset.html', success_message=success_message)
+            elif new_password != confirm_password:
+                # Render the confirm_password_reset.html template with an error message
+                error_message = "Passwords do not match."
+                return render_template('confirm_password_reset.html', error_message=error_message)
+            else:
+                # Render the confirm_password_reset.html template with an error message
+                error_message = "Password should be at least 12 characters long."
+                return render_template('confirm_password_reset.html', error_message=error_message)
+        else:
+            # Incorrect code entered or 'reset_code' not in session, show confirm_password_reset.html again with the entered email
+            error_message = "Incorrect code entered."
+            return render_template('confirm_password_reset.html', error_message=error_message, email=session.get('reset_email'))
+    else:
+        # Render the confirm_password_reset.html template for GET requests
+        return render_template('confirm_password_reset.html', email=session.get('reset_email'))
+
+
+
+
+
 
 
 if __name__ == '__main__':

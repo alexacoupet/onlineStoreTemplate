@@ -257,9 +257,8 @@ def confirm_password_reset():
 
             # Check if passwords match and meet the limit (at least 12 characters)
             if new_password == confirm_password and len(new_password) >= 12:
-                # Render the confirm_password_reset.html template with a success message
-                success_message = "Passwords match and meet the 12-character requirement."
-                return render_template('confirm_password_reset.html', success_message=success_message)
+                # Redirect to password_change_success.html if passwords match and meet the limit
+                return redirect(url_for('password_change_success'))
             elif new_password != confirm_password:
                 # Render the confirm_password_reset.html template with an error message
                 error_message = "Passwords do not match."
@@ -275,7 +274,6 @@ def confirm_password_reset():
     else:
         # Render the confirm_password_reset.html template for GET requests
         return render_template('confirm_password_reset.html', email=session.get('reset_email'))
-
 
 
 

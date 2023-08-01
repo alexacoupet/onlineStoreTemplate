@@ -1,0 +1,18 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="row" id="info_row">
+    <h3>Error: Email not found in the database</h3>
+    <p>Sorry, it appears that the email you entered does not exist within the database.</p>
+    <p>Please make sure you entered the correct email address or try using a different email.</p>
+    <div class="col-md-12" id="login_class">
+        <form action="{{ url_for('password_reset') }}" method="post" id="forgot_passcode_form">
+            <div class="form-group" id="info_form_group">
+                <label for="email">Email</label>
+                <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email">
+            </div>
+            <button type="submit" class="btn btn-primary" id="forgot_passcode_button">Forgot Passcode</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

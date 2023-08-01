@@ -2,8 +2,13 @@
 
 from authentication.auth_tools import login_pipeline, update_passwords, hash_password
 from database.db import Database
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, url_for, redirect, session
 from core.session import Sessions
+import random
+import string
+import os
+
+
 
 app = Flask(__name__)
 HOST, PORT = 'localhost', 8080
@@ -135,6 +140,106 @@ def checkout():
     user_session.submit_cart()
 
     return render_template('checkout.html', order=order, sessions=sessions, total_cost=user_session.total_cost)
+
+
+#---------------------------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------------------
+#                          ||   Added functions and changes from Jack Eliseo   ||
+#---------------------------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------------------
+
+
+app.secret_key = os.environ.get('SECRET_KEY', 'f89049a8cc4bda8828ad76eb822ae791')
+
+
+
+#Route to newpassword.html
+@app.route('/newpassword', methods=['GET'])
+def newpassword():
+    return render_template('newpassword.html')
+
+#Route to good_email.html
+@app.route('/good_email')
+def good_email():
+    return render_template('good_email.html')
+
+
+#Route to bad_email.html
+@app.route('/bad_email')
+def bad_email():
+    return render_template('bad_email.html')
+
+
+#Creation of random 6 digit code user will need to copy for password reset 
+def generate_random_string(length):
+    characters = string.ascii_letters + string.digits + string.punctuation
+    random_string = ''.join(random.choice(characters) for _ in range(length))
+    return random_string
+
+
+@app.route('/password_reset', methods=['POST'])
+def password_reset():
+    """
+    Handles the password reset form submission.
+
+    Args:
+        - None
+
+    Returns:
+        - If the email exists in the database, redirects to the good_email.html page.
+        - If the email does not exist in the database, redirects to the bad_email.html page.
+    """
+    email = request.form['email']
+
+    # Check if the email exists in the database
+    if db.is_valid_email_in_database(email):
+        # Email is valid, generate the random 6-digit code
+        code = generate_random_string(6)
+
+        # Store the code in the session
+        session['reset_code'] = code
+
+        # Redirect to good_email.html
+        return redirect(url_for('good_email'))
+    else:
+        # Email is not valid, redirect to bad_email.html
+        return redirect(url_for('bad_email'))
+
+
+
+@app.route('/password_confirmation', methods=['GET', 'POST'])
+def password_confirmation():
+    """
+    Renders the password confirmation page when the user is at the `/password_confirmation` endpoint.
+
+    Returns:
+        - If the user enters the correct code, redirects to the `confirm_password_reset` route.
+        - If the user enters an incorrect code or the page is accessed via GET, renders the `password_confirmation.html` template.
+    """
+    if request.method == 'POST':
+        entered_code = request.form['code']
+        if 'reset_code' in session and session['reset_code'] == entered_code:
+            # Redirect to confirm_password_reset.html
+            return redirect(url_for('confirm_password_reset'))
+        else:
+            # Incorrect code entered, show password_confirmation.html again
+            return render_template('password_confirmation.html', error=True)
+    else:
+        # Render the password_confirmation.html template for GET requests
+        return render_template('password_confirmation.html')
+
+
+@app.route('/confirm_password_reset')
+def confirm_password_reset():
+    """
+    Renders the confirm password reset page when the user is at the `/confirm_password_reset` endpoint.
+
+    Returns:
+        - None
+    """
+    return render_template('confirm_password_reset.html')
 
 
 if __name__ == '__main__':

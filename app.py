@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 
 from authentication.auth_tools import login_pipeline, update_passwords, hash_password
+from apscheduler.schedulers.background import BackgroundScheduler
+import atexit
+from flask import session
+
 from database.db import Database
 from flask import Flask, render_template, request, url_for, redirect, session
 from core.session import Sessions
@@ -8,7 +12,12 @@ import random
 import string
 import os
 import hashlib
-
+from flask import flash, redirect, url_for
+import os
+import shutil
+from datetime import datetime
+from flask import Flask, jsonify, request
+from datetime import datetime
 
 app = Flask(__name__)
 HOST, PORT = 'localhost', 8080
@@ -19,20 +28,18 @@ products = db.get_full_inventory()
 sessions = Sessions()
 sessions.add_new_session(username, db)
 
+BACKUP_DIR = 'database/backups'
+
 
 @app.route('/')
-def index_page():
+def homepage():
     """
-    Renders the index page when the user is at the `/` endpoint, passing along default flask variables.
-
-    args:
-        - None
-
-    returns:
-        - None
+    Renders the homepage. If a user is logged in, it'll show their information, otherwise the general landing page.
     """
-    return render_template('index.html', username=username, products=products, sessions=sessions)
-
+    if 'username' in session:
+        return render_template('home.html', products=products, username=session['username'], current_path=request.path)
+    else:
+        return render_template('index.html', products=products, current_path=request.path)
 
 @app.route('/login')
 def login_page():
@@ -45,9 +52,80 @@ def login_page():
     returns:
         - None
     """
-    return render_template('login.html')
+    return render_template('login.html', current_path=request.path, sessions=sessions)
+
+# ||   Alexa's code   ||
+@app.route('/backup', methods=['POST'])
+def backup():
+    """Creates a backup of the current database."""
+    try:
+        # Ensure backup directory exists
+        if not os.path.exists(BACKUP_DIR):
+            os.makedirs(BACKUP_DIR)
+
+        # Create a timestamped backup file name
+        timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
+        backup_filename = f'store_records_{timestamp}.db'
+        backup_filepath = os.path.join(BACKUP_DIR, backup_filename)
+
+        # Copy the current database to the backup file
+        shutil.copy2('database/store_records.db', backup_filepath)
+
+        return jsonify({"status": "success", "message": f"Backup created at {backup_filepath}"}), 200
+
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+    
+@app.route('/restore', methods=['POST'])
+def restore():
+    """Restore the database from a given backup."""
+    backup_filename = request.form.get('backup_filename')
+
+    if not backup_filename:
+        return jsonify({"status": "error", "message": "Please provide the backup filename to restore from."}), 400
+
+    backup_filepath = os.path.join(BACKUP_DIR, backup_filename)
+
+    if not os.path.exists(backup_filepath):
+        return jsonify({"status": "error", "message": "Backup file not found."}), 404
+
+    try:
+        # Replace the current database with the backup
+        shutil.copy2(backup_filepath, 'database/store_records.db')
+        return jsonify({"status": "success", "message": "Database restored successfully!"}), 200
+
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
 
 
+def automated_backup():
+    """
+    Function that automatically backs up the database.
+    Calls the backup() function to do the actual backup.
+    """
+    backup()
+
+scheduler = BackgroundScheduler()
+scheduler.add_job(func=automated_backup, trigger="interval", hours=24)
+scheduler.start()
+
+# # Register an exit function to shut down the scheduler when the app exits
+atexit.register(lambda: scheduler.shutdown())
+
+##search website function
+@app.route('/search', methods=['GET'])
+def search():
+    query = request.args.get('q')  # Get the query from the URL
+    if not db.is_valid_search(query):  # Check if the search query is valid
+        return render_template('error.html', message='Invalid search query')
+    
+    results = db.db_search(query)  # Fetch the results from the database
+    if not results:
+        return render_template('no_results.html', message='No results found', query=query)
+    return render_template('search_results.html', results=results, query=query)
+
+
+# ||   Alexa improved login and register function by adding exceptions and user checks   ||
 @app.route('/home', methods=['POST'])
 def login():
     """
@@ -61,16 +139,46 @@ def login():
 
     modifies:
         - sessions: adds a new session to the sessions object
-
     """
     username = request.form['username']
     password = request.form['password']
+    
+    # Check if username exists in the database
+    if not db.user_exists(username):  # Assuming you have such a method in your `db` object
+        flash("Username does not exist!", "error")
+        return redirect(url_for('login_page'))
+    
+    if not login_pipeline(username, password):  # Password is incorrect
+        flash("Incorrect password for the given username.", "error")
+        return redirect(url_for('login_page'))
+
     if login_pipeline(username, password):
         sessions.add_new_session(username, db)
         return render_template('home.html', products=products, sessions=sessions)
+
+
+@app.route('/logout')
+def logout():
+    """
+    Log out the user and redirect to the login page.
+
+    args:
+        - None
+
+    returns:
+        - Redirection to the login page
+
+    modifies:
+        - session: Removes the user's data from the Flask session.
+    """
+    username = session.get('username')
+    if username and sessions.is_active(username):
+        sessions.remove_session(username)
+        flash("You've been logged out!", "success")
     else:
-        print(f"Incorrect username ({username}) or password ({password}).")
-        return render_template('index.html')
+        flash("You're not logged in!", "error")
+    return redirect(url_for('login_page'))
+
 
 
 @app.route('/register')
@@ -84,8 +192,7 @@ def register_page():
     returns:
         - None
     """
-    return render_template('register.html')
-
+    return render_template('register.html', current_path=request.path)
 
 @app.route('/register', methods=['POST'])
 def register():
@@ -96,21 +203,46 @@ def register():
         - None
 
     returns:
-        - None
+        - Redirect or rendered template
 
     modifies:
         - passwords.txt: adds a new username and password combination to the file
         - database/store_records.db: adds a new user to the database
     """
-    username = request.form['username']
-    password = request.form['password']
-    email = request.form['email']
-    first_name = request.form['first_name']
-    last_name = request.form['last_name']
-    salt, key = hash_password(password)
-    update_passwords(username, key, salt)
-    db.insert_user(username, key, email, first_name, last_name)
-    return render_template('index.html')
+    # Sanitize inputs
+    username = request.form['username'].strip()
+    password = request.form['password'].strip()
+    email = request.form['email'].strip()
+    first_name = request.form['first_name'].strip()
+    last_name = request.form['last_name'].strip()
+
+    # Check for empty fields
+    if not (username and password and email and first_name and last_name):
+        flash("All fields must be filled out!", "error")
+        return redirect(url_for('register'))
+    
+    # Check if the email already exists
+    if db.email_exists(email):
+        flash("An account with this email already exists!", "error")
+        return redirect(url_for('register'))
+    
+    # Check if the user already exists
+    if db.user_exists(username):
+        flash("User already exists!", "error")
+        return redirect(url_for('register'))
+    
+    try:
+        salt, key = hash_password(password)
+        update_passwords(username, key, salt)
+        db.insert_user(username, key, email, first_name, last_name)
+        flash('Registration successful! Please login.', 'success')
+        return render_template('index.html')
+
+    except Exception as e:
+        print(e)
+        flash('An error occurred during registration. Please try again.', 'error')
+        return redirect(url_for('register_page'))
+
 
 
 @app.route('/checkout', methods=['POST'])
@@ -139,7 +271,9 @@ def checkout():
 
     user_session.submit_cart()
 
-    return render_template('checkout.html', order=order, sessions=sessions, total_cost=user_session.total_cost)
+    return render_template('checkout.html', order=order, sessions=sessions, total_cost=user_session.total_cost, current_path=request.path)
+
+
 
 
 #---------------------------------------------------------------------------------------------------------------

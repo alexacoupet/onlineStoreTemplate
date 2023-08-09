@@ -1,8 +1,21 @@
 {% extends "layout.html" %}
-
 {% block content %}
+{% include 'navbar.html' %}
+
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+    <ul class="flashed-messages">
+        {% for category, message in messages %}
+            <li class="{{ category }}">{{ message }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+{% endwith %}
+
 <div class="row" id="info_row">
     <h3>Welcome back!</h3>
+
     <div class="col-md-12" id="login_class">
         <form action="/home" method="post" id="login_form">
             <div class="form-group" id="info_form_group">
@@ -18,5 +31,8 @@
             <a href="{{ url_for('newpassword') }}" class="btn btn-link" id="forgot_passcode_button">Forgot Password</a>
         </form>
     </div>
+
+
+    
 </div>
 {% endblock %}

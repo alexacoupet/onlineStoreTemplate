@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+{% include 'navbar.html' %}
+
+{% block content %}
+
+<h3>Search Results for "{{ query }}"</h3>
+
+<ul>
+    {% for item in results %}
+    <li>
+        {{ item.item_name }} - {{ item.info }} - ${{ item.price }} 
+        <img src="{{ item.image_url }}" alt="{{ item.item_name }}" width="100">
+    </li>
+    {% endfor %}
+</ul>
+{% endblock %}

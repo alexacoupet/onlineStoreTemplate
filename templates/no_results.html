@@ -1,0 +1,14 @@
+{% extends "layout.html" %}
+{% include 'navbar.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+            <img src="https://via.placeholder.com/150" alt="Search Icon" class="mb-4"> <!-- This is a placeholder image. You can replace it with an appropriate one if you have. -->
+            <h3 class="mb-3">No results found for "<span class="text-muted">{{ query }}</span>"</h3>
+            <p>Try searching for something else or <a href="/">go back to the homepage</a>.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,26 +1,48 @@
-<!-- Template HTML file  -->
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Group 5 Online Store</title>
+    
+    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
 
 <body>
-    <div class="container">
+    <div class="container mt-5">
+        <!-- Header -->
+        <div class="row mb-4">
+            <div class="col-md-12 text-center">
+                <h1 class="display-4">Private Online Store</h1>
+                <hr class="my-4">
+            </div>
+        </div>
+
+        <!-- Content -->
         <div class="row">
             <div class="col-md-12">
-                <h1>Group 5 Online Store</h1>
-                <hr>
                 <div class="content">
-                    <!-- This is where the content will be rendered -->
                     {% block content %}{% endblock %}
-
                 </div>
             </div>
         </div>
+
+        <!-- Optionally: Footer -->
+        <div class="row mt-5">
+            <div class="col-md-12 text-center">
+                <p>&copy; {{ year }} Group 5 Online Store. All rights reserved.</p>
+            </div>
+        </div>
     </div>
+
+    <!-- Bootstrap scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-pzjw8f+ua7Kw1TIq0v8FqFjcJ6pajs/rfdfs3SO+kDdf6V6Y6MdE8bKfhDAP8aBj" crossorigin="anonymous"></script>
 </body>
+
+</html>

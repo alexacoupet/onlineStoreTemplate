@@ -1,40 +1,61 @@
 {% extends "layout.html" %}
 
 {% block content %}
+{% include 'navbar.html' %}
 
-<div class="row" id="products_page">
-    <div class="col-md-12">
-        <h3>Products</h3>
-        <hr>
-        <div class="row">
-            <form action="/checkout" method="post">
-                <div class="form-group">
-                    <div class="row">
-                        {% for product in products %}
-                        <div class="col-md-4">
-                            <div class="product_card" id="product_card">
-                                <img src="{{ product.image_url }}" class="product_card-img" alt="...">
-                                <div class="product_card-body">
-                                    <h5 class="product_card-title">{{ product.item_name }}</h5>
-                                    <p class="product_card-text">{{ product.info }}</p>
-                                    <p class="product_card-price">${{ product.price }}</p>
-                                    <input type="number" class="quantity" id={{product.id}} name={{product.id}}
-                                        placeholder="0">
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="/">Private Online Store</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link" href="/">Home</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/login">Login</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/register">Register</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+<div class="container mt-4">  <!-- added a container and margin-top -->
+    <div class="row" id="products_page">
+        <div class="col-md-12">
+            <h3>Products</h3>
+            <hr>
+            <div class="row">
+                <form action="/checkout" method="post">
+                    <div class="form-group">
+                        <div class="row">
+                            {% for product in products %}
+                            <div class="col-md-4 mb-4"> <!-- added margin-bottom for spacing -->
+                                <div class="product_card" id="product_card">
+                                    <img src="{{ product.image_url }}" class="product_card-img" alt="...">
+                                    <div class="product_card-body">
+                                        <h5 class="product_card-title">{{ product.item_name }}</h5>
+                                        <p class="product_card-text">{{ product.info }}</p>
+                                        <p class="product_card-price">${{ product.price }}</p>
+                                        <input type="number" class="quantity form-control" id={{product.id}} name={{product.id}} placeholder="0">
+                                    </div>
                                 </div>
                             </div>
+                            {% endfor %}
                         </div>
-                        {% endfor %}
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-12" id="index_buttons">
-                        <button type="submit" class="btn btn-primary" id="checkout_button">Order</button>
+                    <div class="row">
+                        <div class="col-md-12" id="index_buttons">
+                            <button type="submit" class="btn btn-primary" id="checkout_button">Order</button>
+                        </div>
                     </div>
-                </div>
-            </form>
+                </form>
+            </div>
         </div>
     </div>
 </div>
-
 
 {% endblock %}

@@ -1,3 +1,59 @@
+/* Fullscreen Navbar Styling */
+.navbar {
+    padding: 0.8rem 1rem; /* Change these values as needed */
+    font-size: 0.9rem; /* Change this value as needed */
+    background: linear-gradient(45deg, #285e58, #70b472);
+    border: none;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    width: 100%; /* Ensure navbar takes up the full width */
+    position: fixed; /* Fix the navbar to the top */
+    top: 0;
+    left: 0;
+    z-index: 1000; /* Make sure the navbar is always on top */
+}
+
+.navbar-brand,
+.navbar-nav .nav-link {
+    color: #ffffff !important;
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+.navbar-nav .nav-link:hover,
+.navbar-nav .nav-item.active .nav-link {
+    color: #eee !important;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+    padding: 8px 15px;
+}
+
+.navbar-toggler-icon {
+    filter: brightness(0) invert(1);
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    padding-top: 70px; /* Adjust body padding to avoid content getting hidden under the fixed navbar */
+}
+
+
+.flashed-messages {
+    list-style-type: none;
+    padding-left: 0;
+    margin-bottom: 20px;
+}
+
+.flashed-messages li {
+    padding: 10px;
+    border: 1px solid #e0e0e0;
+    margin-bottom: 5px;
+}
+
+.flashed-messages li.error {
+    background-color: #ffe0e0;
+    color: #c00;
+}
+
 #index_buttons {
     padding-top: 15px;
     margin: 0 auto;

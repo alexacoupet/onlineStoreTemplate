@@ -29,7 +29,10 @@ class Database:
     #-----------------------------------------------
     #-----------------------------------------------
         
-
+    def email_exists(self, email: str) -> bool:
+        """Check if an email already exists in the database."""
+        self.cursor.execute("SELECT 1 FROM users WHERE email=?", (email,))
+        return bool(self.cursor.fetchone())
 
     def execute_query(self, query):
         connection = sqlite3.connect(self.database_path)
@@ -39,7 +42,18 @@ class Database:
         return cursor  # Return the cursor instead of fetching all results
 
 
+    def user_exists(self, username: str) -> bool:
+        """
+        Checks if the provided username exists in the database.
 
+        args:
+            - username: The username to check.
+
+        returns:
+            - True if the user exists, otherwise False.
+        """
+        self.cursor.execute("SELECT 1 FROM users WHERE username=?", (username,))
+        return bool(self.cursor.fetchone())
 
 
     def is_valid_email_in_database(self, email: str) -> bool:
@@ -118,57 +132,32 @@ class Database:
     # ------ Getter methods ------
 
     def get_full_inventory(self):
-        """
-        Gets all inventory in the database.
-
-        args:
-            - None
-
-        returns:
-            - List of the full inventory table from the database.
-        """
         self.cursor.execute("SELECT * FROM inventory")
         return self.cursor.fetchall()
 
     def get_all_item_ids(self):
-        """
-        Gets all item ids in the database.
-
-        args:
-            - None
-
-        returns:
-            - List of all item ids in the database.
-        """
         self.cursor.execute("SELECT id FROM inventory")
         return self.cursor.fetchall()
 
     def get_item_name_by_id(self, item_id: int):
-        """
-        Gets an item's name from the database.
+        self.cursor.execute("SELECT item_name FROM inventory WHERE id = ?", (item_id,))
+        result = self.cursor.fetchone()
+        return result[0] if result else None
 
-        args:
-            - item_id: The id of the item to get.
+    def is_valid_search(self, query):
+        return query.isdigit() or (isinstance(query, str) and len(query.strip()) > 0)
 
-        returns:
-            - The item with the given id.
-        """
-        self.cursor.execute("SELECT * FROM inventory WHERE id = ?", (item_id,))
-        return self.cursor.fetchone()
+    def db_search(self, query):
+        if self.is_valid_search(query):
+            if query.isdigit():
+                item = self.get_item_name_by_id(int(query))
+                return [item] if item else []
+            else:
+                self.cursor.execute("SELECT * FROM inventory WHERE item_name LIKE ?", (f"%{query}%",))
+                return self.cursor.fetchall()
+        return []  # Return an empty list if the query is not valid
 
-    def get_item_info_by_id(self, item_id: int):
-        """
-        Gets the info (description) of an item from the database.
 
-        args:
-            - item_id: The id of the item to get.
-
-        returns:
-            - The info of the item with the given id.
-        """
-        self.cursor.execute(
-            "SELECT info FROM inventory WHERE id = ?", (item_id,))
-        return self.cursor.fetchone()
 
     def get_item_price_by_id(self, item_id: int):
         """

@@ -2,3 +2,4 @@ flask==2.2.2
 pylint==2.17.1
 plantuml==0.3.0
 six==1.16.0
+APScheduler==3.10.1

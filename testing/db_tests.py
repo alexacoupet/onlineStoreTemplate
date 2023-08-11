@@ -47,6 +47,29 @@ def test_get_inventory_exists(db: Database = None) -> tuple:
         return True, "Full inventory is not empty."
 
 
+def test_get_item_by_id(db: Database = None) -> tuple:
+        """
+        Tests that the item is fetched using id.
+
+        args:
+            - db: an sqlite3 database object (optional)
+
+        returns:
+            - error_report: a tuple containing a boolean and a string,
+              where the boolean is True if the test passed and False if it failed,
+              and the string is the error report.
+        """
+
+        db = Database("database/store_records.db") if db is None else db
+        item_by_id = db.get_item_by_id(1)
+
+        if len(item_by_id) == 0:
+            error = f"Error in test_get_item_by_id: Result is empty.\n  - Actual: {len(item_by_id)}"
+            return False, error
+        else:
+            return True, "We have an item fetched by it's id."
+
+
 def test_dict_factory_link(db: Database = None) -> tuple:
     """
     Tests that the row factory is linked to dict_factory.

@@ -42,6 +42,11 @@ class Database:
         return cursor  # Return the cursor instead of fetching all results
 
 
+    def create_cart(self):
+        self.cursor.execute("CREATE TABLE IF NOT EXISTS cart(id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                            "user VARCHAR(255), product_id INTEGER)")
+        self.connection.commit()
+
     def user_exists(self, username: str) -> bool:
         """
         Checks if the provided username exists in the database.
@@ -131,12 +136,30 @@ class Database:
 
     # ------ Getter methods ------
 
+    def add_to_cart(self, user: str, product: int):
+        self.cursor.execute(
+            "INSERT INTO cart (user,product_id) VALUES (?,?)", (user, product)
+        )
+        self.connection.commit()
+
+    def get_cart_items(self, user:str):
+        self.cursor.execute("SELECT * FROM cart where user=?", (user,))
+        return self.cursor.fetchall()
+
+    def get_user_id(self, username: str):
+        self.cursor.execute("SELECT * from users where username=?", (username,))
+        return self.cursor.fetchall()
+
     def get_full_inventory(self):
         self.cursor.execute("SELECT * FROM inventory")
         return self.cursor.fetchall()
 
     def get_all_item_ids(self):
         self.cursor.execute("SELECT id FROM inventory")
+        return self.cursor.fetchall()
+
+    def get_item_by_id(self, id: int):
+        self.cursor.execute("SELECT * FROM inventory WHERE id = ?", (id,))
         return self.cursor.fetchall()
 
     def get_item_name_by_id(self, item_id: int):

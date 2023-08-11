@@ -137,12 +137,20 @@ body {
 }
 
 #add_to_cart_button {
-    background-color: #a89585;
+    /*background-color: #a89585;
     border-color: #ccc;
     color: rgb(32, 30, 30);
     width: 60px;
     font-weight: bold;
     margin-top: 10px;
+    margin-bottom: 10px;
+    text-align: center;*/
+    background-color: #cec5a7;
+    border-color: #ccc;
+    color: rgb(32, 30, 30);
+    width: 100%;
+    font-weight: bold;
+    margin-top: 25px;
     margin-bottom: 10px;
     text-align: center;
 }
@@ -175,4 +183,12 @@ body {
     margin-top: 10px;
     margin-bottom: 10px;
     text-align: center;
+}
+
+
+
+@media screen and (max-width: 765px){
+    #add_to_cart_button {
+        margin-top: 16px;
+    }
 }

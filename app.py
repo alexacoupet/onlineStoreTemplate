@@ -153,6 +153,7 @@ def login():
         return redirect(url_for('login_page'))
 
     if login_pipeline(username, password):
+        session['user'] = username
         sessions.add_new_session(username, db)
         return render_template('home.html', products=products, sessions=sessions)
 
@@ -244,6 +245,26 @@ def register():
         return redirect(url_for('register_page'))
 
 
+@app.route('/cart')
+def cart():
+    username = session.get('user')
+    if username is None:
+        return render_template("home.html")
+    product = request.args.get("id", None)
+    if product is not None:
+        print(product)
+        print(username)
+        db.add_to_cart(username, product)
+
+    cart_stuff = db.get_cart_items(username)
+
+    items = []
+    for item in cart_stuff:
+        id = item.get('product_id')
+        pro = db.get_item_by_id(id)
+        items.append(pro[0])
+    print(items)
+    return render_template("cart.html", items=items)
 
 @app.route('/checkout', methods=['POST'])
 def checkout():

@@ -54,7 +54,17 @@ def login_page():
     """
     return render_template('login.html', current_path=request.path, sessions=sessions)
 
-# ||   Alexa's code   ||
+
+# |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+# ||                                                                                                                       ||
+# ||                                                                                                                       ||                   
+# ||                                                                                                                       ||
+# ||                              *****  Added functions and changes from Alexa Coupet *****                               ||
+# ||                                                                                                                       ||
+# ||                                                                                                                       ||
+# ||                                                                                                                       || 
+# |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
 @app.route('/backup', methods=['POST'])
 def backup():
     """Creates a backup of the current database."""
@@ -125,7 +135,9 @@ def search():
     return render_template('search_results.html', results=results, query=query)
 
 
-# ||   Alexa improved login and register function by adding exceptions and user checks   ||
+
+
+# ||   Alexa's login and register function with exceptions and user checks  ||
 @app.route('/home', methods=['POST'])
 def login():
     """
@@ -194,6 +206,7 @@ def register_page():
         - None
     """
     return render_template('register.html', current_path=request.path)
+
 
 @app.route('/register', methods=['POST'])
 def register():
